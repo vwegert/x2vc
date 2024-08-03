@@ -205,6 +205,7 @@ class AbstractRuleTest {
 	 * Test method for {@link org.x2vc.analysis.rules.AbstractRule#consolidateResults(IXMLSchema, Set)}.
 	 */
 	@Test
+	@SuppressWarnings("java:S4738") // suggestion is nonsense, java type does not fit
 	void testConsolidateResultsSingleCandidate() {
 		final var schemaObjectID = UUID.randomUUID();
 		final IXMLSchema schema = mock();

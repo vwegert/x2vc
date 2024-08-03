@@ -52,11 +52,8 @@ class EvaluationTreeItemFactoryTest {
 
 	private EvaluationTreeItemFactory factory;
 
-	/**
-	 * @throws java.lang.Exception
-	 */
 	@BeforeEach
-	void setUp() throws Exception {
+	void setUp() {
 		this.factory = new EvaluationTreeItemFactory(this.schema, this.coordinator);
 	}
 

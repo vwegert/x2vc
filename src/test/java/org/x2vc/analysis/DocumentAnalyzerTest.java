@@ -21,7 +21,6 @@ import static org.mockito.Mockito.*;
 
 import java.io.File;
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -83,11 +82,8 @@ class DocumentAnalyzerTest {
 
 	private URI stylesheetURI;
 
-	/**
-	 * @throws java.lang.Exception
-	 */
 	@BeforeEach
-	void setUp() throws Exception {
+	void setUp() {
 		this.taskID = UUID.randomUUID();
 		this.stylesheetURI = URIUtilities.makeMemoryURI(ObjectType.STYLESHEET, "foobar");
 		lenient().when(this.container.isFailed()).thenReturn(false);
@@ -145,6 +141,7 @@ class DocumentAnalyzerTest {
 	 * Test method for {@link org.x2vc.analysis.DocumentAnalyzer#verifyDocument}.
 	 */
 	@Test
+	@SuppressWarnings("java:S4738") // suggestion is nonsense, java type does not fit
 	void testFollowUpPassWithoutFilter() {
 		final DocumentAnalyzer analyzer = new DocumentAnalyzer(Sets.newSet(this.rule), this.schemaManager);
 
@@ -233,6 +230,7 @@ class DocumentAnalyzerTest {
 	 * Test method for {@link org.x2vc.analysis.DocumentAnalyzer#verifyDocument}.
 	 */
 	@Test
+	@SuppressWarnings("java:S4738") // suggestion is nonsense, java type does not fit
 	void testFollowUpPassWithFilter() {
 		final DocumentAnalyzer analyzer = new DocumentAnalyzer(Sets.newSet(this.rule), this.schemaManager);
 
@@ -288,11 +286,9 @@ class DocumentAnalyzerTest {
 
 	/**
 	 * Test method for {@link org.x2vc.analysis.DocumentAnalyzer#consolidateResults(java.net.URI, java.util.Set)}.
-	 *
-	 * @throws URISyntaxException
 	 */
 	@Test
-	void testConsolidate() throws URISyntaxException {
+	void testConsolidate() {
 		this.stylesheetURI = new File(
 				"src/test/resources/data/org.x2vc.analysis.DocumentAnalyzer/SampleStylesheet.xslt")
 			.toURI();

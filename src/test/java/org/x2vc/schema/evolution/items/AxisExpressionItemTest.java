@@ -57,11 +57,8 @@ class AxisExpressionItemTest {
 
 	private AxisExpressionItem treeItem;
 
-	/**
-	 * @throws java.lang.Exception
-	 */
 	@BeforeEach
-	void setUp() throws Exception {
+	void setUp() {
 		this.treeItem = new AxisExpressionItem(this.schema, this.coordinator, this.expression);
 	}
 
@@ -99,6 +96,7 @@ class AxisExpressionItemTest {
 	}
 
 	@Test
+	@SuppressWarnings("java:S4738") // suggestion is nonsense, java type does not fit
 	void testEvaluation_AxisAttribute_WithoutNodeTest() {
 		when(this.expression.getAxis()).thenReturn(AxisInfo.ATTRIBUTE);
 		when(this.expression.getNodeTest()).thenReturn(null);
@@ -124,6 +122,7 @@ class AxisExpressionItemTest {
 	}
 
 	@Test
+	@SuppressWarnings("java:S4738") // suggestion is nonsense, java type does not fit
 	void testEvaluation_AxisAttribute_WithNodeTest() {
 		final NodeTest nodeTest = mock();
 		final INodeTestTreeItem nodeTestItem = mock();
@@ -159,6 +158,7 @@ class AxisExpressionItemTest {
 	}
 
 	@Test
+	@SuppressWarnings("java:S4738") // suggestion is nonsense, java type does not fit
 	void testEvaluation_AxisChild_WithoutNodeTest() {
 		when(this.expression.getAxis()).thenReturn(AxisInfo.CHILD);
 		when(this.expression.getNodeTest()).thenReturn(null);
@@ -184,6 +184,7 @@ class AxisExpressionItemTest {
 	}
 
 	@Test
+	@SuppressWarnings("java:S4738") // suggestion is nonsense, java type does not fit
 	void testEvaluation_AxisChild_WithNodeTest() {
 		final NodeTest nodeTest = mock();
 		final INodeTestTreeItem nodeTestItem = mock();
@@ -219,6 +220,7 @@ class AxisExpressionItemTest {
 	}
 
 	@Test
+	@SuppressWarnings("java:S4738") // suggestion is nonsense, java type does not fit
 	void testEvaluation_AxisDescendant_WithoutNodeTest() {
 		when(this.expression.getAxis()).thenReturn(AxisInfo.DESCENDANT);
 		when(this.expression.getNodeTest()).thenReturn(null);
@@ -256,6 +258,7 @@ class AxisExpressionItemTest {
 	}
 
 	@Test
+	@SuppressWarnings("java:S4738") // suggestion is nonsense, java type does not fit
 	void testEvaluation_AxisDescendant_WithNodeTest() {
 		final NodeTest nodeTest = mock();
 		final INodeTestTreeItem nodeTestItem = mock();
@@ -298,6 +301,7 @@ class AxisExpressionItemTest {
 	}
 
 	@Test
+	@SuppressWarnings("java:S4738") // suggestion is nonsense, java type does not fit
 	void testEvaluation_AxisDescendantOrSelf_WithoutNodeTest() {
 		when(this.expression.getAxis()).thenReturn(AxisInfo.DESCENDANT_OR_SELF);
 		when(this.expression.getNodeTest()).thenReturn(null);
@@ -336,6 +340,7 @@ class AxisExpressionItemTest {
 	}
 
 	@Test
+	@SuppressWarnings("java:S4738") // suggestion is nonsense, java type does not fit
 	void testEvaluation_AxisDescendantOrSelf_WithNodeTest() {
 		final NodeTest nodeTest = mock();
 		final INodeTestTreeItem nodeTestItem = mock();
@@ -379,6 +384,7 @@ class AxisExpressionItemTest {
 	}
 
 	@Test
+	@SuppressWarnings("java:S4738") // suggestion is nonsense, java type does not fit
 	void testEvaluation_AxisParent_WithoutNodeTest() {
 		when(this.expression.getAxis()).thenReturn(AxisInfo.PARENT);
 		when(this.expression.getNodeTest()).thenReturn(null);
@@ -412,6 +418,7 @@ class AxisExpressionItemTest {
 	}
 
 	@Test
+	@SuppressWarnings("java:S4738") // suggestion is nonsense, java type does not fit
 	void testEvaluation_AxisParent_WithNodeTest() {
 		final NodeTest nodeTest = mock();
 		final INodeTestTreeItem nodeTestItem = mock();
@@ -478,6 +485,7 @@ class AxisExpressionItemTest {
 	}
 
 	@Test
+	@SuppressWarnings("java:S4738") // suggestion is nonsense, java type does not fit
 	void testEvaluation_AxisSelf_WithNodeTest() {
 		final NodeTest nodeTest = mock();
 		final INodeTestTreeItem nodeTestItem = mock();
