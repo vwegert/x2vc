@@ -7,11 +7,12 @@
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
  * which is available at https://www.eclipse.org/legal/epl-2.0/
- * 
+ *
  * SPDX-License-Identifier: EPL-2.0
  * #L%
  */
 package org.x2vc.schema.evolution.items;
+
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.util.Deque;
@@ -162,7 +163,8 @@ public class EvaluationTreeItemFactory implements IEvaluationTreeItemFactory {
 		}
 		// TODO #12 support Expression subclass ..net.sf.saxon.expr.PseudoExpression (abstract)
 		// TODO #12 support Expression subclass ....net.sf.saxon.expr.DefaultedArgumentExpression
-		// TODO #12 support Expression subclass ......net.sf.saxon.expr.DefaultedArgumentExpression.DefaultCollationArgument
+		// TODO #12 support Expression subclass
+		// ......net.sf.saxon.expr.DefaultedArgumentExpression.DefaultCollationArgument
 		// TODO #12 support Expression subclass ....net.sf.saxon.expr.sort.SortKeyDefinition
 		// TODO #12 support Expression subclass ....net.sf.saxon.expr.sort.SortKeyDefinitionList
 		// TODO #12 support Expression subclass ....net.sf.saxon.pattern.Pattern (abstract)
@@ -199,14 +201,10 @@ public class EvaluationTreeItemFactory implements IEvaluationTreeItemFactory {
 					adjacentTextNodeMerger);
 		} else if (expression instanceof final AtomicSequenceConverter atomicSequenceConverter) {
 			// Expression subclass ....net.sf.saxon.expr.AtomicSequenceConverter
-			// The conversion itself does not constitute a value access, but check the contained expression.
-			newItem = new UnaryExpressionItem<AtomicSequenceConverter>(this.schema, this.coordinator,
-					atomicSequenceConverter);
-		} else if (expression instanceof final UntypedSequenceConverter untypedSequenceConverter) {
 			// Expression subclass ......net.sf.saxon.expr.UntypedSequenceConverter
 			// The conversion itself does not constitute a value access, but check the contained expression.
 			newItem = new UnaryExpressionItem<AtomicSequenceConverter>(this.schema, this.coordinator,
-					untypedSequenceConverter);
+					atomicSequenceConverter);
 		} else if (expression instanceof final Atomizer atomizer) {
 			// Expression subclass ....net.sf.saxon.expr.Atomizer
 			// The atomizer itself does not constitute a value access, but check the contained expression.
