@@ -7,12 +7,11 @@
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
  * which is available at https://www.eclipse.org/legal/epl-2.0/
- * 
+ *
  * SPDX-License-Identifier: EPL-2.0
  * #L%
  */
 package org.x2vc.schema.evolution.items;
-
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -20,6 +19,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
+import java.util.Collection;
+import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -29,6 +31,8 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.x2vc.schema.evolution.IModifierCreationCoordinator;
 import org.x2vc.schema.evolution.ISchemaElementProxy;
+import org.x2vc.schema.structure.IElementReference;
+import org.x2vc.schema.structure.IElementType;
 import org.x2vc.schema.structure.IXMLSchema;
 
 import com.google.common.collect.ImmutableCollection;
@@ -215,54 +219,6 @@ class AxisExpressionItemTest {
 	}
 
 	@Test
-	void testEvaluation_AxisSelf_WithoutNodeTest() {
-		when(this.expression.getAxis()).thenReturn(AxisInfo.SELF);
-		when(this.expression.getNodeTest()).thenReturn(null);
-
-		final ISchemaElementProxy contextItem = mock();
-
-		this.treeItem.initialize(this.itemFactory);
-		final ImmutableCollection<ISchemaElementProxy> result = this.treeItem.evaluate(contextItem);
-
-		// the axis expression itself does not record any access, this is done by the node test
-		verify(this.coordinator, never()).handleAttributeAccess(any(), any());
-		verify(this.coordinator, never()).handleElementAccess(any(), any());
-
-		// the result set should contain the node itself
-		assertEquals(1, result.size());
-		assertTrue(result.contains(contextItem));
-	}
-
-	@Test
-	void testEvaluation_AxisSelf_WithNodeTest() {
-		final NodeTest nodeTest = mock();
-		final INodeTestTreeItem nodeTestItem = mock();
-		when(this.itemFactory.createItemForNodeTest(nodeTest)).thenReturn(nodeTestItem);
-
-		when(this.expression.getAxis()).thenReturn(AxisInfo.SELF);
-		when(this.expression.getNodeTest()).thenReturn(nodeTest);
-
-		final ISchemaElementProxy contextItem = mock();
-
-		// setup the node test to let the node pass
-		when(nodeTestItem.filter(Set.of(contextItem))).thenReturn(ImmutableList.of(contextItem));
-
-		this.treeItem.initialize(this.itemFactory);
-		final ImmutableCollection<ISchemaElementProxy> result = this.treeItem.evaluate(contextItem);
-
-		// ensure that the node test was called
-		verify(nodeTestItem, times(1)).evaluate(contextItem);
-
-		// the axis expression itself does not record any access, this is done by the node test
-		verify(this.coordinator, never()).handleAttributeAccess(any(), any());
-		verify(this.coordinator, never()).handleElementAccess(any(), any());
-
-		// the result set should only contain all one attribute
-		assertEquals(1, result.size());
-		assertTrue(result.contains(contextItem));
-	}
-
-	@Test
 	void testEvaluation_AxisDescendant_WithoutNodeTest() {
 		when(this.expression.getAxis()).thenReturn(AxisInfo.DESCENDANT);
 		when(this.expression.getNodeTest()).thenReturn(null);
@@ -420,6 +376,134 @@ class AxisExpressionItemTest {
 		assertTrue(result.contains(subItem1));
 		assertTrue(result.contains(subItem1a));
 		assertTrue(result.contains(subItem2b));
+	}
+
+	@Test
+	void testEvaluation_AxisParent_WithoutNodeTest() {
+		when(this.expression.getAxis()).thenReturn(AxisInfo.PARENT);
+		when(this.expression.getNodeTest()).thenReturn(null);
+
+		final IElementReference elementReference1 = mock();
+		final IElementReference elementReference2 = mock();
+		final IElementReference elementReference3 = mock();
+		final IElementType elementType = mock();
+		when(elementType.hasElementContent()).thenReturn(true);
+		when(elementType.getElements()).thenReturn(List.of(elementReference1, elementReference2, elementReference3));
+		when(this.schema.getElementTypes()).thenReturn(ImmutableSet.of(elementType));
+		when(this.schema.getReferencesUsing(elementType))
+			.thenReturn(ImmutableSet.of(elementReference1, elementReference2, elementReference3));
+
+		final ISchemaElementProxy contextItem = mock();
+		when(contextItem.isElement()).thenReturn(true);
+		when(contextItem.getElementReference()).thenReturn(Optional.of(elementReference2));
+
+		this.treeItem.initialize(this.itemFactory);
+		final ImmutableCollection<ISchemaElementProxy> result = this.treeItem.evaluate(contextItem);
+
+		// the axis expression itself does not record any access, this is done by the node test
+		verify(this.coordinator, never()).handleAttributeAccess(any(), any());
+		verify(this.coordinator, never()).handleElementAccess(any(), any());
+
+		// the result set should contain all three references
+		assertEquals(3, result.size());
+		assertTrue(result.stream().anyMatch(p -> p.getElementReference().get().equals(elementReference1)));
+		assertTrue(result.stream().anyMatch(p -> p.getElementReference().get().equals(elementReference2)));
+		assertTrue(result.stream().anyMatch(p -> p.getElementReference().get().equals(elementReference3)));
+	}
+
+	@Test
+	void testEvaluation_AxisParent_WithNodeTest() {
+		final NodeTest nodeTest = mock();
+		final INodeTestTreeItem nodeTestItem = mock();
+		when(this.itemFactory.createItemForNodeTest(nodeTest)).thenReturn(nodeTestItem);
+
+		when(this.expression.getAxis()).thenReturn(AxisInfo.PARENT);
+		when(this.expression.getNodeTest()).thenReturn(nodeTest);
+
+		final IElementReference elementReference1 = mock();
+		final IElementReference elementReference2 = mock();
+		final IElementReference elementReference3 = mock();
+		final IElementType elementType = mock();
+		when(elementType.hasElementContent()).thenReturn(true);
+		when(elementType.getElements()).thenReturn(List.of(elementReference1, elementReference2, elementReference3));
+		when(this.schema.getElementTypes()).thenReturn(ImmutableSet.of(elementType));
+		when(this.schema.getReferencesUsing(elementType))
+			.thenReturn(ImmutableSet.of(elementReference1, elementReference2, elementReference3));
+
+		final ISchemaElementProxy contextItem = mock();
+		when(contextItem.isElement()).thenReturn(true);
+		when(contextItem.getElementReference()).thenReturn(Optional.of(elementReference2));
+
+		// setup the node test to only let one of the elements pass
+		doAnswer(invocation -> {
+			final Collection<ISchemaElementProxy> candidateItems = invocation.getArgument(0);
+			final var filteredItems = candidateItems.stream()
+				.filter(i -> i.getElementReference().get().equals(elementReference2))
+				.toList();
+			return ImmutableList.copyOf(filteredItems);
+		}).when(nodeTestItem).filter(any());
+
+		this.treeItem.initialize(this.itemFactory);
+		final ImmutableCollection<ISchemaElementProxy> result = this.treeItem.evaluate(contextItem);
+
+		// ensure that the node test was called
+		verify(nodeTestItem, times(1)).evaluate(contextItem);
+
+		// the axis expression itself does not record any access, this is done by the node test
+		verify(this.coordinator, never()).handleAttributeAccess(any(), any());
+		verify(this.coordinator, never()).handleElementAccess(any(), any());
+
+		// the result set should contain only one reference
+		assertEquals(1, result.size());
+		assertTrue(result.stream().anyMatch(p -> p.getElementReference().get().equals(elementReference2)));
+	}
+
+	@Test
+	void testEvaluation_AxisSelf_WithoutNodeTest() {
+		when(this.expression.getAxis()).thenReturn(AxisInfo.SELF);
+		when(this.expression.getNodeTest()).thenReturn(null);
+
+		final ISchemaElementProxy contextItem = mock();
+
+		this.treeItem.initialize(this.itemFactory);
+		final ImmutableCollection<ISchemaElementProxy> result = this.treeItem.evaluate(contextItem);
+
+		// the axis expression itself does not record any access, this is done by the node test
+		verify(this.coordinator, never()).handleAttributeAccess(any(), any());
+		verify(this.coordinator, never()).handleElementAccess(any(), any());
+
+		// the result set should contain the node itself
+		assertEquals(1, result.size());
+		assertTrue(result.contains(contextItem));
+	}
+
+	@Test
+	void testEvaluation_AxisSelf_WithNodeTest() {
+		final NodeTest nodeTest = mock();
+		final INodeTestTreeItem nodeTestItem = mock();
+		when(this.itemFactory.createItemForNodeTest(nodeTest)).thenReturn(nodeTestItem);
+
+		when(this.expression.getAxis()).thenReturn(AxisInfo.SELF);
+		when(this.expression.getNodeTest()).thenReturn(nodeTest);
+
+		final ISchemaElementProxy contextItem = mock();
+
+		// setup the node test to let the node pass
+		when(nodeTestItem.filter(Set.of(contextItem))).thenReturn(ImmutableList.of(contextItem));
+
+		this.treeItem.initialize(this.itemFactory);
+		final ImmutableCollection<ISchemaElementProxy> result = this.treeItem.evaluate(contextItem);
+
+		// ensure that the node test was called
+		verify(nodeTestItem, times(1)).evaluate(contextItem);
+
+		// the axis expression itself does not record any access, this is done by the node test
+		verify(this.coordinator, never()).handleAttributeAccess(any(), any());
+		verify(this.coordinator, never()).handleElementAccess(any(), any());
+
+		// the result set should only contain all one attribute
+		assertEquals(1, result.size());
+		assertTrue(result.contains(contextItem));
 	}
 
 }
