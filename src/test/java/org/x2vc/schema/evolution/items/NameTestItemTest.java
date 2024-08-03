@@ -7,12 +7,11 @@
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
  * which is available at https://www.eclipse.org/legal/epl-2.0/
- * 
+ *
  * SPDX-License-Identifier: EPL-2.0
  * #L%
  */
 package org.x2vc.schema.evolution.items;
-
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -54,11 +53,8 @@ class NameTestItemTest {
 
 	private NameTestItem nameTestItem;
 
-	/**
-	 * @throws java.lang.Exception
-	 */
 	@BeforeEach
-	void setUp() throws Exception {
+	void setUp() {
 		this.nameTestItem = new NameTestItem(this.schema, this.coordinator, this.nameTest);
 	}
 
@@ -149,6 +145,48 @@ class NameTestItemTest {
 		final ImmutableCollection<ISchemaElementProxy> resultElems = this.nameTestItem.filter(elems);
 		assertEquals(1, resultElems.size());
 		assertTrue(resultElems.contains(attrib3));
+
+	}
+
+	@Test
+	void testUnsupported() {
+		final StructuredQName elementName = new StructuredQName("", NamespaceUri.NULL, "fooBar");
+		when(this.nameTest.getNodeKind()).thenReturn((int) Type.TEXT);
+		when(this.nameTest.getMatchingNodeName()).thenReturn(elementName);
+
+		this.nameTestItem.initialize(this.itemFactory);
+
+		// no subordinate items required for this item type
+		verify(this.itemFactory, never()).createItemForExpression(any());
+		verify(this.itemFactory, never()).createItemForNodeTest(any());
+
+		// access may not be recorded in the initialization phase
+		verify(this.coordinator, never()).handleAttributeAccess(any(), any());
+		verify(this.coordinator, never()).handleElementAccess(any(), any());
+
+		// evaluate the node test itself (should not change the context)
+		final ISchemaElementProxy contextItem = mock();
+		final ImmutableCollection<ISchemaElementProxy> resultItems = this.nameTestItem.evaluate(contextItem);
+		assertEquals(1, resultItems.size());
+		assertTrue(resultItems.contains(contextItem));
+
+		// ensure no element access was registered
+		verify(this.coordinator, never()).handleElementAccess(contextItem, elementName);
+		verify(this.coordinator, never()).handleAttributeAccess(eq(contextItem), any());
+
+		// prepare some elements to filter
+		final ISchemaElementProxy elem1 = mock("elem1");
+		final ISchemaElementProxy elem2 = mock("elem2");
+		final ISchemaElementProxy elem3 = mock("elem3");
+		final ISchemaElementProxy elem4 = mock("elem4");
+		final Collection<ISchemaElementProxy> elems = Set.of(elem1, elem2, elem3, elem4);
+
+		final ImmutableCollection<ISchemaElementProxy> resultElems = this.nameTestItem.filter(elems);
+		assertEquals(4, resultElems.size());
+		assertTrue(resultElems.contains(elem1));
+		assertTrue(resultElems.contains(elem2));
+		assertTrue(resultElems.contains(elem3));
+		assertTrue(resultElems.contains(elem4));
 
 	}
 
