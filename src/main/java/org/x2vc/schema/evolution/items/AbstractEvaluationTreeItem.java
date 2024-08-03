@@ -7,12 +7,11 @@
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
  * which is available at https://www.eclipse.org/legal/epl-2.0/
- * 
+ *
  * SPDX-License-Identifier: EPL-2.0
  * #L%
  */
 package org.x2vc.schema.evolution.items;
-
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -92,9 +91,7 @@ public abstract class AbstractEvaluationTreeItem<T> implements IEvaluationTreeIt
 	 */
 	protected abstract ImmutableCollection<ISchemaElementProxy> evaluate(ISchemaElementProxy contextItem, T target);
 
-	/**
-	 * @return the schema
-	 */
+	@Override
 	public IXMLSchema getSchema() {
 		return this.schema;
 	}
